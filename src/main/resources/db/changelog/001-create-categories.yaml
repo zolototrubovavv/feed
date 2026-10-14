@@ -1,0 +1,38 @@
+databaseChangeLog:
+  - changeSet:
+      id: 001-create-categories-table
+      author: feed_user
+      changes:
+        - createTable:
+            tableName: categories
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+              - column:
+                  name: name
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false
+                    unique: true
+      rollback:
+        - dropTable:
+            tableName: categories
+
+  - changeSet:
+      id: 002-insert-initial-categories
+      author: feed_user
+      changes:
+        - sql:
+            sql: |
+              INSERT INTO categories (name) VALUES
+                ('sports'),
+                ('technology'),
+                ('entertainment');
+      rollback:
+        - sql:
+            sql: |
+              DELETE FROM categories WHERE name IN ('sports', 'technology', 'entertainment');

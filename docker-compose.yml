@@ -1,0 +1,74 @@
+version: '3.8'
+
+services:
+  keycloak:
+    image: quay.io/keycloak/keycloak:25.0.1
+    command: ["start-dev", "--http-enabled=true"]
+    environment:
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin
+    ports:
+      - "8081:8080"
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.6.0
+    container_name: zookeeper_news
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+
+  kafka:
+    image: confluentinc/cp-kafka:7.6.0
+    container_name: kafka_news
+    ports:
+      - "9092:9092"
+    depends_on:
+      - zookeeper
+    environment:
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      # Настраиваем два канала связи: внутрь докера для продюсера и наружу для Spring Boot
+      KAFKA_LISTENERS: INT://0.0.0.0:29092,EXT://0.0.0.0:9092
+      KAFKA_ADVERTISED_LISTENERS: INT://kafka:29092,EXT://localhost:9092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INT:PLAINTEXT,EXT:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: INT
+      # Настройки для быстрой работы одной ноды
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+  redis:
+    image: redis:7-alpine
+    container_name: redis
+    ports:
+      - "6379:6379"
+    command: redis-server --appendonly yes
+    volumes:
+      - redis-data:/data
+    networks:
+      - app-net
+  # postgres:
+  #   image: postgres:16
+  #   environment:
+  #     POSTGRES_DB: feed_db
+  #     POSTGRES_USER: feed_user
+  #     POSTGRES_PASSWORD: password
+  #   ports:
+  #     - "5432:5432"
+  #   volumes:
+  #     - postgres_data:/var/lib/postgresql/data
+  # feed-service:
+    # image: feed-service:latest
+    # build:
+    #   context: .
+    #   dockerfile: Dockerfile
+    # environment:
+    #   # подключаемся к БД по имени сервиса "postgres"
+    #   SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/feed
+    #   SPRING_DATASOURCE_USERNAME: feed_user
+    #   SPRING_DATASOURCE_PASSWORD: password
+    #   SPRING_JPA_HIBERNATE_DDL_AUTO: none
+    # ports:
+    #   - "8080:8080"
+    # depends_on:
+    #   - postgres
+volumes:
+  redis-data:
+
+networks:
+  app-net:

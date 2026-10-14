@@ -1,0 +1,80 @@
+databaseChangeLog:
+  - changeSet:
+      id: 001-create-news-table
+      author: feed_user
+      changes:
+        - createTable:
+            tableName: news
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+              - column:
+                  name: title
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: content
+                  type: TEXT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: status
+                  type: VARCHAR(20)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: published_at
+                  type: TIMESTAMP
+              - column:
+                  name: category_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: created_at
+                  type: TIMESTAMP
+                  constraints:
+                    nullable: false
+                  defaultValueComputed: CURRENT_TIMESTAMP
+              - column:
+                  name: updated_at
+                  type: TIMESTAMP
+                  constraints:
+                    nullable: false
+                  defaultValueComputed: CURRENT_TIMESTAMP
+
+        - addForeignKeyConstraint:
+            constraintName: fk_news_category_id
+            baseTableName: news
+            baseColumnNames: category_id
+            referencedTableName: categories
+            referencedColumnNames: id
+
+        - createIndex:
+            indexName: idx_news_category_id
+            tableName: news
+            columns:
+              - column:
+                  name: category_id
+
+        - createIndex:
+            indexName: idx_news_status
+            tableName: news
+            columns:
+              - column:
+                  name: status
+
+        - createIndex:
+            indexName: idx_news_published_at
+            tableName: news
+            columns:
+              - column:
+                  name: published_at
+      rollback:
+        - dropTable:
+            tableName: news
