@@ -35,7 +35,10 @@ import tools.jackson.databind.ObjectMapper;
 public class NewsCacheService {
 
     private final RedisTemplate<String, Object> redisTemplate;
-    private final ObjectMapper objectMapper;
+    private final ObjectMapper objectMapper; // с 4 версии Spring Boot стоит использовать JsonMapper
+    //  @ConditionalOnMissingBean в Boot 4 стоит на JsonMapper. Если кто-то позже объявит свой @Bean ObjectMapper -
+    //  автоконфигурация не отключится, и в контексте окажутся два маппера с разными настройками.
+    //  В Spring Boot 3 условие стояло на ObjectMapper
     private final NewsMapper newsMapper;
     private final NewsRepository newsRepository;
 

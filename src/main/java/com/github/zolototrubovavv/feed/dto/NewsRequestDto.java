@@ -18,6 +18,11 @@ public record NewsRequestDto(
     @NotNull
     Long categoryId
 ) {
+    // Можно чуть компактнее сделать конструкторы в record
+    //     public NewsRequestDto {
+    //        title = TrimUtils.trim(title);
+    //        content = TrimUtils.trim(content);
+    //    }
     public NewsRequestDto(String title, String content, Long categoryId) {
         this.title = TrimUtils.trim(title);
         this.content = TrimUtils.trim(content);

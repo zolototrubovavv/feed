@@ -17,6 +17,10 @@ import org.springframework.kafka.core.ProducerFactory;
 import org.springframework.kafka.support.serializer.JacksonJsonDeserializer;
 import org.springframework.kafka.support.serializer.JacksonJsonSerializer;
 
+/**
+ * Конфиги хорошо лежат в config, так что этот класс и KafkaTopicConfig лучше тоже положить в /config/kafka
+ * Остальное можно оставить тут и получится, что код отдельно, конфигурация отдельно
+ */
 @Configuration
 public class KafkaNewsConfig {
 

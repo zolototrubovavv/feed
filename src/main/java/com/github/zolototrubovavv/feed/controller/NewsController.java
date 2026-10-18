@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -25,6 +26,50 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+/**
+ * Общее для текущего и CategoryController:
+ *
+ * 1. Не указан content-type, который принимают и отдают методы
+ * Можно указать общий в @RequestMapping, так же в каждой аннотации над методом (@GetMapping, @PostMapping, @PatchMapping, @DeleteMapping)
+ * consumes имеет смысл только для @PostMapping/@PutMapping/@PatchMapping (так же тут может быть и produces), а для GET/DELETE достаточно produces
+ *
+ * А для @DeleteMapping можно возвращать void вместо ResponseEntity<Void> и повесить аннотацию @ResponseStatus(HttpStatus.NO_CONTENT)
+ *
+ * Тогда методы будут выглядеть достаточно коротко, к примеру:
+ *
+ *
+ * 2. Везде возвращается ResponseEntity.ok(...) - можно убрать ResponseEntity и оставить только возвращаемую модель в этих методах
+ *
+ * 3. Для логирования входящего\исходящего запросов можно использовать logbook: https://github.com/zalando/logbook
+ * чтобы в каждом методе контроллера убрать бойлерплейтную часть, относящуюся к логированию
+ *
+ * Если будешь прикручивать logbook, то вот наш конфиг для примера для application.yml:
+ *
+ * logbook:
+ *   format.style: http
+ *   write.max-body-size: 4096 <- стоит указывать всегда, чтобы не грузить ELK при объемных запросах\ответах
+ *   predicate:
+ *     exclude:
+ *       - path: "${management.server.port}${management.endpoints.web.base-path}**"
+ *       - path: "/swagger**"
+ *       - path: "/v3/**"
+ *       - path: "/api-docs**"
+ *       - path: "/swagger-ui**"
+ *
+ * logging.level:
+ *    org.zalando.logbook: TRACE
+ *
+ *
+ *
+ *
+ *  Если вынести логи в logbook, и избавиться от ResponseEntity, то методы будут достаточно короткими:
+ *
+ *     @GetMapping(value = "/latest", produces = MediaType.APPLICATION_JSON_VALUE)
+ *     public List<NewsDto> getLatestNews() {
+ *         return newsService.getLatest();
+ *     }
+ *
+ */
 @Slf4j
 @RestController
 @RequestMapping("/api/news")
@@ -111,7 +156,10 @@ public class NewsController {
         log.info("REST response -> Method: DELETE, Path: /api/news/{} | Status: 204 No Content", id);
         return ResponseEntity.noContent().build();
     }
-    
+
+    // Похоже, что метод доступен анонимно:
+    // SecurityConfig: правило .requestMatchers(GET, "/api/news", "/api/news/**").permitAll() стоит выше .authenticated()
+    // Spring Security применяет первое совпавшее правило -> GET /api/news/1/publish
     @GetMapping("/{id}/publish")
     public ResponseEntity<NewsDto> publishNewsById(@PathVariable Long id) {
         log.info("REST request -> Method: GET, Path: /api/news/{}/publish", id);
