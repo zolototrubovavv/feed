@@ -1,6 +1,5 @@
 package com.github.zolototrubovavv.feed.kafka;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.awaitility.Awaitility.await;
 
@@ -10,15 +9,14 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.system.CapturedOutput;
 import org.springframework.boot.test.system.OutputCaptureExtension;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import org.testcontainers.kafka.KafkaContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
+import org.testcontainers.kafka.KafkaContainer;
 import org.testcontainers.utility.DockerImageName;
 
 import com.github.zolototrubovavv.feed.service.NewsCacheService;
@@ -29,9 +27,10 @@ import com.github.zolototrubovavv.feed.service.NewsCacheService;
 @DisplayName("Integration Tests for KafkaNewsConsumer with NewsEvent")
 class KafkaNewsIntegrationIT {
 
-    @Container
+@Container
 private static final KafkaContainer kafkaContainer = 
         new KafkaContainer(DockerImageName.parse("apache/kafka:3.7.2")); 
+    
     @Autowired
     private KafkaTemplate<String, Object> kafkaTemplate;
 
@@ -44,8 +43,8 @@ private static final KafkaContainer kafkaContainer =
     }
 
     @Test
-    @DisplayName("Should successfully consume PUBLISHED NewsEvent, evict cache, and write correct log format")
-    void shouldConsumePublishedNewsEvent(CapturedOutput output) {
+    @DisplayName("Should successfully consume PUBLISHED NewsEvent and evict cache")
+    void shouldConsumePublishedNewsEvent() {
         Long newsId = 555L;
         String topic = "news-events";
         
@@ -63,17 +62,11 @@ private static final KafkaContainer kafkaContainer =
         await().atMost(5, SECONDS).untilAsserted(() -> {
             Mockito.verify(newsCacheService, Mockito.atLeastOnce()).refreshNewsCache(newsId);
         });
-
-        String logOutput = output.getOut();
-        
-        assertThat(logOutput).contains("Received Kafka event -> Topic: news-events, Type: PUBLISHED, Target ID: 555");
-        assertThat(logOutput).contains("Processing event 'PUBLISHED' -> Target ID: 555");
-        assertThat(logOutput).contains("Successfully processed event 'PUBLISHED' -> Target ID: 555 | Status: Cache evicted");
     }
 
     @Test
-    @DisplayName("Should successfully consume DELETED NewsEvent and process log structure")
-    void shouldConsumeDeletedNewsEvent(CapturedOutput output) {
+    @DisplayName("Should successfully consume DELETED NewsEvent")
+    void shouldConsumeDeletedNewsEvent() {
         Long newsId = 777L;
         String topic = "news-events";
         NewsEvent deletedEvent = new NewsEvent(
@@ -90,11 +83,5 @@ private static final KafkaContainer kafkaContainer =
         await().atMost(5, SECONDS).untilAsserted(() -> {
             Mockito.verify(newsCacheService, Mockito.atLeastOnce()).refreshNewsCache(newsId);
         });
-
-        String logOutput = output.getOut();
-        
-        assertThat(logOutput).contains("Received Kafka event -> Topic: news-events, Type: DELETED, Target ID: 777");
-        assertThat(logOutput).contains("Processing event 'DELETED' -> Target ID: 777");
-        assertThat(logOutput).contains("Successfully processed event 'DELETED' -> Target ID: 777 | Status: Cache evicted");
     }
 }

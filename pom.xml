@@ -14,26 +14,6 @@
 	<artifactId>feed</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 
-    <!-- Если блоки пустые, то можно удалить их и добавлять по мере необходимости
-
-	<name/>
-	<description/>
-	<url/>
-	<licenses>
-		<license/>
-	</licenses>
-	<developers>
-		<developer/>
-	</developers>
-	<scm>
-		<connection/>
-		<developerConnection/>
-		<tag/>
-		<url/>
-	</scm>
-
-	-->
-
 	<properties>
 		<java.version>17</java.version>
     	<org.mapstruct.version>1.6.3</org.mapstruct.version>
@@ -44,7 +24,7 @@
 			<dependency>
 				<groupId>org.testcontainers</groupId>
 				<artifactId>testcontainers-bom</artifactId>
-				<version>1.20.4</version>
+				<version>1.21.4</version>
 				<type>pom</type>
 				<scope>import</scope>
 			</dependency>
@@ -141,8 +121,8 @@
 			<artifactId>jakarta.validation-api</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>org.springframework.kafka</groupId>
-			<artifactId>spring-kafka</artifactId>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-kafka</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -156,6 +136,11 @@
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-cache</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.zalando</groupId>
+			<artifactId>logbook-spring-boot-starter</artifactId>
+			<version>4.2.0</version>
 		</dependency>
 		<dependency>
 			<groupId>org.testcontainers</groupId>

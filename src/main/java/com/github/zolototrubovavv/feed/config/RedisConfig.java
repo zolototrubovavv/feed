@@ -1,5 +1,6 @@
 package com.github.zolototrubovavv.feed.config;
 
+import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
@@ -13,6 +14,7 @@ import tools.jackson.databind.jsontype.PolymorphicTypeValidator;
 
 @Slf4j
 @Configuration
+@EnableCaching
 public class RedisConfig {
 
     @Bean
@@ -23,8 +25,8 @@ public class RedisConfig {
             template.setConnectionFactory(connectionFactory);
 
             PolymorphicTypeValidator typeValidator = BasicPolymorphicTypeValidator.builder()
-                    .allowIfBaseType("com.github.zolototrubovavv") 
-                    .allowIfBaseType(java.util.Collection.class)
+                    .allowIfSubType("com.github.zolototrubovavv") 
+                    .allowIfSubType(java.util.Collection.class)
                     .build();
             
             GenericJacksonJsonRedisSerializer jsonSerializer = GenericJacksonJsonRedisSerializer.builder()
