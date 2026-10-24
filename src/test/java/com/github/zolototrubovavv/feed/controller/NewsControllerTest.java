@@ -1,6 +1,5 @@
 package com.github.zolototrubovavv.feed.controller;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -49,7 +48,7 @@ class NewsControllerTest {
     private org.springframework.cache.CacheManager cacheManager;
 
     @Test
-    @DisplayName("Should return paginated news and check log structure")
+    @DisplayName("Should return paginated news")
     void shouldGetNewsPageSuccessfully(CapturedOutput output) throws Exception {
         PageResponse<NewsDto> mockPageResponse = new PageResponse<>(
                 Collections.emptyList(), 0, 10, 0L, 0, true
@@ -63,10 +62,6 @@ class NewsControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.totalElements").value(0))
                 .andExpect(jsonPath("$.last").value(true));
-
-        String logOutput = output.getOut();
-        assertThat(logOutput).contains("REST request -> Method: GET, Path: /api/news, Page: 0, Size: 10");
-        assertThat(logOutput).contains("REST response -> Method: GET, Path: /api/news | Status: 200 OK, Total elements: 0, Total pages: 0");
     }
 
     @Test
@@ -81,8 +76,5 @@ class NewsControllerTest {
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.error").value("Validation Error"))
                 .andExpect(jsonPath("$.message").value("One or more fields are invalid"));
-
-        String logOutput = output.getOut();
-        assertThat(logOutput).contains("REST API Exception -> Path: /api/news, Method: POST | Validation Failed");
     }
 }

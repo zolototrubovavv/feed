@@ -41,7 +41,7 @@ public class News {
     @Column(name = "published_at")
     private LocalDateTime publishedAt;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "category_id", nullable = false)
     private Category category; 
 

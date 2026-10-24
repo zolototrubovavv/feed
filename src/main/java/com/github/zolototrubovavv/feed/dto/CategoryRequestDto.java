@@ -10,8 +10,7 @@ public record CategoryRequestDto(
     @Size(min = 3, max = 10000)
     String name
 ) {
-    
-    public CategoryRequestDto(String name) {
-        this.name = TrimUtils.trim(name);
+    public CategoryRequestDto {
+        name = TrimUtils.trim(name);
     }
 }

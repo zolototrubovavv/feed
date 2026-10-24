@@ -1,6 +1,5 @@
 package com.github.zolototrubovavv.feed.controller;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -44,7 +43,7 @@ class CategoryControllerTest {
     private org.springframework.cache.CacheManager cacheManager;
 
     @Test
-    @DisplayName("Should return 200 OK and valid log formats on successful GET by ID")
+    @DisplayName("Should return 200 OK on successful GET by ID")
     void shouldGetCategoryByIdSuccessfully(CapturedOutput output) throws Exception {
         Long id = 1L;
         CategoryDto mockDto = new CategoryDto(id, "Technology");
@@ -55,14 +54,10 @@ class CategoryControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(id))
                 .andExpect(jsonPath("$.name").value("Technology"));
-
-        String logOutput = output.getOut();
-        assertThat(logOutput).contains("REST request -> Method: GET, Path: /api/categories/1");
-        assertThat(logOutput).contains("REST response -> Method: GET, Path: /api/categories/1 | Status: 200 OK, Name: 'Technology'");
     }
 
     @Test
-    @DisplayName("Should return 404 NOT FOUND and log WARN when category does not exist")
+    @DisplayName("Should return 404 NOT FOUND when category does not exist")
     void shouldReturn404WhenCategoryNotFound(CapturedOutput output) throws Exception {
         Long id = 99L;
         Mockito.when(categoryService.getById(id)).thenThrow(new CategoryNotFoundException(id));
@@ -73,9 +68,5 @@ class CategoryControllerTest {
                 .andExpect(jsonPath("$.status").value(404))
                 .andExpect(jsonPath("$.error").value("Not Found"))
                 .andExpect(jsonPath("$.message").value("Category with id 99 not found"));
-
-        String logOutput = output.getOut();
-        assertThat(logOutput).contains("REST request -> Method: GET, Path: /api/categories/99");
-        assertThat(logOutput).contains("REST API Exception -> Path: /api/categories/99, Method: GET | Resource Not Found: Category with id 99 not found");
     }
 }

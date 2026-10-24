@@ -13,9 +13,8 @@ public record NewsRequestPatchDto(
 
     Long categoryId
 ) {
-    public NewsRequestPatchDto(String title, String content, Long categoryId) {
-        this.title = TrimUtils.trim(title);
-        this.content = TrimUtils.trim(content);
-        this.categoryId = categoryId;
+    public NewsRequestPatchDto {
+        title = TrimUtils.trim(title);
+        content = TrimUtils.trim(content);
     }
 }

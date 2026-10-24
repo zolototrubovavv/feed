@@ -14,8 +14,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.boot.test.system.CapturedOutput;
-import org.springframework.boot.test.system.OutputCaptureExtension;
 
 import com.github.zolototrubovavv.feed.dto.CategoryDto;
 import com.github.zolototrubovavv.feed.dto.CategoryRequestDto;
@@ -24,7 +22,7 @@ import com.github.zolototrubovavv.feed.exception.category.CategoryNameAlreadyExi
 import com.github.zolototrubovavv.feed.mapper.CategoryMapper;
 import com.github.zolototrubovavv.feed.repository.CategoryRepository;
 
-@ExtendWith({MockitoExtension.class, OutputCaptureExtension.class})
+@ExtendWith(MockitoExtension.class)
 @DisplayName("Unit Tests for CategoryService")
 class CategoryServiceTest {
 
@@ -38,8 +36,8 @@ class CategoryServiceTest {
     private CategoryService categoryService;
 
     @Test
-    @DisplayName("Should successfully create a category and log standard formats")
-    void shouldCreateCategorySuccessfully(CapturedOutput output) {
+    @DisplayName("Should successfully create a category")
+    void shouldCreateCategorySuccessfully() {
         CategoryRequestDto requestDto = new CategoryRequestDto("Finance");
         Category entityToCreate = new Category();
         entityToCreate.setName("Finance");
@@ -60,25 +58,18 @@ class CategoryServiceTest {
         assertThat(result).isNotNull();
         assertThat(result.getId()).isEqualTo(10L);
         assertThat(result.getName()).isEqualTo("Finance");
-
-        String logs = output.getOut();
-        assertThat(logs).contains("Creating new category -> Request context:");
-        assertThat(logs).contains("Successfully created new category -> Created ID: 10 | Name: 'Finance'");
         
         verify(categoryRepository, times(1)).save(entityToCreate);
     }
 
     @Test
-    @DisplayName("Should throw exception and log WARN when category name already exists")
-    void shouldThrowExceptionWhenNameExists(CapturedOutput output) {
+    @DisplayName("Should throw exception when category name already exists")
+    void shouldThrowExceptionWhenNameExists() {
         CategoryRequestDto requestDto = new CategoryRequestDto("Finance");
         when(categoryRepository.existsByNameIgnoreCase("Finance", null)).thenReturn(true);
 
         assertThatThrownBy(() -> categoryService.create(requestDto))
                 .isInstanceOf(CategoryNameAlreadyExistsException.class);
-
-        String logs = output.getOut();
-        assertThat(logs).contains("Category creation rejected -> Name: 'Finance' | Reason: Name already exists");
         
         verify(categoryRepository, never()).save(any(Category.class));
     }

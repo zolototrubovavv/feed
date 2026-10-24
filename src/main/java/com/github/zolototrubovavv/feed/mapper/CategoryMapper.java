@@ -3,16 +3,14 @@ package com.github.zolototrubovavv.feed.mapper;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
-import org.mapstruct.factory.Mappers;
 
+import com.github.zolototrubovavv.feed.config.MapStructConfig;
 import com.github.zolototrubovavv.feed.dto.CategoryDto;
 import com.github.zolototrubovavv.feed.dto.CategoryRequestDto;
 import com.github.zolototrubovavv.feed.entity.Category;
 
-@Mapper(componentModel = "spring")
+@Mapper(config = MapStructConfig.class)
 public interface CategoryMapper {
-
-    CategoryMapper INSTANCE = Mappers.getMapper(CategoryMapper.class);
 
     CategoryDto toDto(Category category);
     

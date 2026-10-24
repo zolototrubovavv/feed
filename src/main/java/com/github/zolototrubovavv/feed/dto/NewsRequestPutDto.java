@@ -6,7 +6,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
-public record NewsRequestDto(
+public record NewsRequestPutDto(
     @NotBlank
     @Size(min = 3, max = 255)
     String title,
@@ -18,9 +18,8 @@ public record NewsRequestDto(
     @NotNull
     Long categoryId
 ) {
-    public NewsRequestDto(String title, String content, Long categoryId) {
-        this.title = TrimUtils.trim(title);
-        this.content = TrimUtils.trim(content);
-        this.categoryId = categoryId;
+    public NewsRequestPutDto {
+        title = TrimUtils.trim(title);
+        content = TrimUtils.trim(content);
     }
 }
